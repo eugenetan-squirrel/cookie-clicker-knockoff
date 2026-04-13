@@ -1,0 +1,92 @@
+# Cookie Clicker Mod Integration - Changes Summary
+
+## What Was Fixed
+
+### 1. Frozen Cookies URL Issue
+**Problem**: The original URL `https://github.erbkaiser.com/FrozenCookies/frozen_cookies.js` doesn't exist
+**Solution**: Changed to correct GitHub raw CDN URL: `https://raw.githubusercontent.com/erbkaiser/FrozenCookies/main/frozen_cookies.js`
+
+### 2. Mod Settings Integration
+Added proper mod toggle switches directly into the Settings menu (Options panel):
+- **Cookie Monster** - Toggle on/off
+- **Frozen Cookies** - Toggle on/off
+
+The toggles match the style of existing settings like "Show Cursors" and "Show Milk".
+
+### 3. Preferences System
+Added two new game preferences:
+```
+Game.prefs.modsCookieMonster=1
+Game.prefs.modsFrozenCookies=1
+```
+
+These preferences are:
+- Saved with your game save data
+- Default to enabled (ON)
+- Can be toggled through the Settings menu
+- Are respected by the mod loader
+
+### 4. Page Reload Behavior
+When you toggle mods ON/OFF:
+1. Your preference is saved
+2. The game marks itself for reload
+3. Page reloads to apply changes
+4. Mods load (or unload) based on your preference
+
+This ensures mods load at the right time and prevents conflicts.
+
+### 5. Improved Mod Loader
+Updated `mod_loader.js` to:
+- Check Game.prefs before loading mods
+- Only load enabled mods
+- Provide better error handling
+- Use proper IIFE (Immediately Invoked Function Expression)
+- Log to browser console for debugging
+
+## File Changes
+
+### main.js
+- Added `Game.prefs.modsCookieMonster=1` 
+- Added `Game.prefs.modsFrozenCookies=1`
+- Added `Game.ToggleMods()` function
+- Added mod toggle buttons to Settings menu
+
+### mods/mod_loader.js
+- Complete rewrite for better reliability
+- Now checks Game.prefs
+- Corrected Frozen Cookies URL
+- Better error handling and logging
+
+### mods/README.md
+- Updated documentation
+- Added instructions about toggling mods
+- Updated correct CDN URLs
+
+## How to Use
+
+1. Open Cookie Clicker (index.html)
+2. Click "Options" to open Settings
+3. Scroll down to find the mod toggles:
+   - **Cookie Monster** (Automation and info mod)
+   - **Frozen Cookies** (Optimization and utility mod)
+4. Toggle ON/OFF as desired
+5. Page will reload automatically
+6. Mods will load based on your settings
+
+## Troubleshooting
+
+If mods don't load:
+1. Check browser console (F12) for errors
+2. Verify privacy extension isn't blocking CDN
+3. Whitelist these domains:
+   - `raw.githubusercontent.com`
+   - `cookiemonsterteam.github.io`
+4. Refresh the page manually
+5. Check that mod toggles are ON in Settings
+
+## All Ads Removed ✓
+- Cookie consent script
+- Facebook Pixel tracking
+- Google AdSense ads
+- Playsaurus banners
+- AdventureQuest ads
