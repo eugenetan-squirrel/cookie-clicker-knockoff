@@ -3,7 +3,7 @@
 
 (function(){
     if (typeof Game !== 'undefined' && Game.LoadMod) {
-        Game.LoadMod('https://cookiemonsterteam.github.io/CookieMonster/dist/CookieMonster.js');
+        Game.LoadMod('mods/CookieMonster.js');
     } else {
         // Retry if Game object not ready yet
         setTimeout(arguments.callee, 100);

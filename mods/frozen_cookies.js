@@ -13,14 +13,7 @@ if (Game.version > lastCompatibleVersion) {
     );
 }
 
-var scriptElement =
-    document.getElementById("frozenCookieScript") !== null
-        ? document.getElementById("frozenCookieScript")
-        : document.getElementById("modscript_frozen_cookies");
-var baseUrl =
-    scriptElement !== null
-        ? scriptElement.getAttribute("src").replace(/\/frozen_cookies\.js$/, "")
-        : "https://github.erbkaiser.com/FrozenCookies/";
+var baseUrl = "mods/frozen_cookies";
 var FrozenCookies = {
     baseUrl: baseUrl,
     branch: "erb-",
@@ -29,19 +22,19 @@ var FrozenCookies = {
 
 // Load external libraries and FC scripts in order
 var script_list = [
-    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js",
-    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css",
-    "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jcanvas/20.1.1/min/jcanvas.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisLabelRenderer.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.trendline.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.logAxisRenderer.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.cursor.min.js",
+    FrozenCookies.baseUrl + "/vendor/jquery-ui.min.js",
+    FrozenCookies.baseUrl + "/vendor/jquery-ui.min.css",
+    FrozenCookies.baseUrl + "/vendor/underscore-min.js",
+    FrozenCookies.baseUrl + "/vendor/jcanvas.min.js",
+    FrozenCookies.baseUrl + "/vendor/jquery.jqplot.min.js",
+    FrozenCookies.baseUrl + "/vendor/jquery.jqplot.min.css",
+    FrozenCookies.baseUrl + "/vendor/jqplot.canvasTextRenderer.min.js",
+    FrozenCookies.baseUrl + "/vendor/jqplot.canvasAxisLabelRenderer.min.js",
+    FrozenCookies.baseUrl + "/vendor/jqplot.canvasAxisTickRenderer.min.js",
+    FrozenCookies.baseUrl + "/vendor/jqplot.trendline.min.js",
+    FrozenCookies.baseUrl + "/vendor/jqplot.highlighter.min.js",
+    FrozenCookies.baseUrl + "/vendor/jqplot.logAxisRenderer.min.js",
+    FrozenCookies.baseUrl + "/vendor/jqplot.cursor.min.js",
     FrozenCookies.baseUrl + "/fc_preferences.js", // preferences must be loaded before the rest of the scripts
     FrozenCookies.baseUrl + "/cc_upgrade_prerequisites.js", // upgrade prerequisites, used in fc_main.js
     FrozenCookies.baseUrl + "/fc_main.js", // main logic
@@ -88,12 +81,7 @@ function loadScript(id) {
 function fcInit() {
     var jquery = document.createElement("script");
     jquery.setAttribute("type", "text/javascript");
-    jquery.setAttribute("src", "https://code.jquery.com/jquery-3.6.0.min.js");
-    jquery.setAttribute(
-        "integrity",
-        "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-    );
-    jquery.setAttribute("crossorigin", "anonymous");
+    jquery.setAttribute("src", FrozenCookies.baseUrl + "/vendor/jquery-3.6.0.min.js");
     jquery.onload = function () {
         loadScript(0);
     };

@@ -16527,7 +16527,7 @@ Game.Launch=function()
 		else setTimeout(function(){Game.LoadSave();},100);
 		
 		Game.ready=1;
-		setTimeout(function(){if (LOCAL || (typeof showAds==='undefined' && (!l('detectAds') || l('detectAds').clientHeight<1))) Game.addClass('noAds');},500);
+		setTimeout(function(){if (LOCAL || (!l('detectAds') || l('detectAds').clientHeight<1)) Game.addClass('noAds');},500);
 		l('offGameMessage').innerHTML='';
 		l('offGameMessageWrap').style.display='none';
 		

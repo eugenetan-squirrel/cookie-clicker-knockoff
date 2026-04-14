@@ -1,6 +1,8 @@
 // Master Mod Loader
 // This file loads all mods on page entry based on Game preferences
 // Loads after Game object is initialized
+// NOTE: If mods don't load, you may need to disable your ad blocker or privacy filters
+// which can block external script loading
 
 (function() {
     'use strict';
@@ -13,7 +15,7 @@
             return;
         }
         
-        // Load Frozen Cookies if enabled
+        // Load Frozen Cookies if enabled (local file, should work even with ad blockers)
         if (Game.prefs && Game.prefs.modsFrozenCookies) {
             try {
                 console.log('[Mod Loader] Loading Frozen Cookies...');
@@ -24,13 +26,13 @@
             }
         }
         
-        // Load Cookie Monster if enabled
+        // Load Cookie Monster if enabled (local build supplied in the project)
         if (Game.prefs && Game.prefs.modsCookieMonster) {
             try {
-                console.log('[Mod Loader] Loading Cookie Monster...');
-                Game.LoadMod('https://cookiemonsterteam.github.io/CookieMonster/dist/CookieMonster.js');
+                console.log('[Mod Loader] Loading Cookie Monster from local file...');
+                Game.LoadMod('mods/CookieMonster.js');
             } catch (e) {
-                console.error('[Mod Loader] Failed to load Cookie Monster:', e);
+                console.error('[Mod Loader] Failed to load local Cookie Monster:', e);
             }
         }
         

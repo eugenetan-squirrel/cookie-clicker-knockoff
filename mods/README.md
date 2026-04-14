@@ -4,10 +4,10 @@ This directory contains the mod loader files for Cookie Clicker.
 
 ## Mods Included
 
-1. **Cookie Monster** (https://cookiemonsterteam.github.io/CookieMonster/dist/CookieMonster.js)
+1. **Cookie Monster** (local file: `mods/CookieMonster.js`)
    - Advanced game info and automation features
    
-2. **Frozen Cookies** (https://raw.githubusercontent.com/erbkaiser/FrozenCookies/main/frozen_cookies.js)
+2. **Frozen Cookies** (local file: `mods/frozen_cookies.js`)
    - A comprehensive automation and optimization mod
 
 ## How It Works
