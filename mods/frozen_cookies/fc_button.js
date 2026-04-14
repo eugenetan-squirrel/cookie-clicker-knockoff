@@ -1131,6 +1131,10 @@ function cyclePreference(preferenceName) {
             Game.RefreshStore();
             Game.RebuildUpgrades();
             FCStart();
+            // Save preferences to localStorage
+            if (FrozenCookies.savePreferences) {
+                FrozenCookies.savePreferences();
+            }
         }
     }
 }
@@ -1144,6 +1148,10 @@ function setPreferenceDirect(preferenceName, value) {
         Game.RefreshStore();
         Game.RebuildUpgrades();
         FCStart();
+        // Save preferences to localStorage
+        if (FrozenCookies.savePreferences) {
+            FrozenCookies.savePreferences();
+        }
     }
 }
 

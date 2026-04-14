@@ -38,6 +38,67 @@
         
         if (Game.prefs && (Game.prefs.modsFrozenCookies || Game.prefs.modsCookieMonster)) {
             console.log('[Mod Loader] Mods loaded successfully');
+            
+            // Performance optimizations when both mods are active
+            if (Game.prefs.modsFrozenCookies && Game.prefs.modsCookieMonster) {
+                console.warn('[Mod Loader] WARNING: Both Frozen Cookies and Cookie Monster are enabled.');
+                
+                // Check if performance mode is enabled in preferences
+                if (Game.prefs.performanceMode) {
+                    console.log('[Mod Loader] Performance mode enabled - applying optimizations...');
+                    
+                    // Set a global flag that mods can check for performance mode
+                    window.COOKIE_MODS_PERFORMANCE_MODE = true;
+                    
+                    // Add CSS to reduce animations and effects that might cause lag
+                    var style = document.createElement('style');
+                    style.id = 'performanceModeStyles';
+                    style.textContent = `
+                        /* Performance optimizations when both mods are active */
+                        .particles { display: none !important; }
+                        .sparkles { display: none !important; }
+                        .goldenCookie { transition: none !important; }
+                        .shimmer { transition: none !important; }
+                        #particles { display: none !important; }
+                        #sparkles { display: none !important; }
+                        
+                        /* Reduce animation complexity */
+                        * {
+                            animation-duration: 0.1s !important;
+                            transition-duration: 0.1s !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Override requestAnimationFrame to throttle it when both mods are active
+                    var originalRAF = window.requestAnimationFrame;
+                    var lastRAFTime = 0;
+                    var rafThrottle = 32; // ~30fps instead of 60fps
+                    
+                    window.requestAnimationFrame = function(callback) {
+                        var now = Date.now();
+                        if (now - lastRAFTime >= rafThrottle) {
+                            lastRAFTime = now;
+                            return originalRAF(callback);
+                        } else {
+                            // Fallback to setTimeout for throttling
+                            return setTimeout(function() {
+                                callback(performance.now());
+                            }, rafThrottle - (now - lastRAFTime));
+                        }
+                    };
+                }
+                
+                // Add a visual warning to the game
+                setTimeout(function() {
+                    if (Game && Game.Notify) {
+                        var message = Game.prefs.performanceMode ? 
+                            'Performance Mode active - lag reduced.' : 
+                            'Both mods enabled. Enable Performance Mode in options to reduce lag.';
+                        Game.Notify('Performance Notice', message, [16, 5], 8);
+                    }
+                }, 2000);
+            }
         }
     }
     

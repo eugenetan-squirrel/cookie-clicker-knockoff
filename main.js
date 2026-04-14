@@ -2309,6 +2309,7 @@ Game.Launch=function()
 			Game.prefs.discordPresence=1;//if true and applicable, show game activity in Discord status
 			Game.prefs.modsCookieMonster=0;//if true, load Cookie Monster mod
 			Game.prefs.modsFrozenCookies=0;//if true, load Frozen Cookies mod
+			Game.prefs.performanceMode=0;//if true, enable performance optimizations when both mods are active
 		}
 		Game.DefaultPrefs();
 		
@@ -6718,6 +6719,68 @@ Game.Launch=function()
 				setTimeout(window.LoadModsNow, 100);
 			}
 		}
+		Game.TogglePerformanceMode=function()
+		{
+			Game.prefs.performanceMode = !Game.prefs.performanceMode;
+			if (Game.prefs.performanceMode) {
+				// Enable performance mode
+				window.COOKIE_MODS_PERFORMANCE_MODE = true;
+				// Apply performance optimizations
+				var style = document.createElement('style');
+				style.id = 'performanceModeStyles';
+				style.textContent = `
+					/* Performance optimizations when both mods are active */
+					.particles { display: none !important; }
+					.sparkles { display: none !important; }
+					.goldenCookie { transition: none !important; }
+					.shimmer { transition: none !important; }
+					#particles { display: none !important; }
+					#sparkles { display: none !important; }
+					
+					/* Reduce animation complexity */
+					* {
+						animation-duration: 0.1s !important;
+						transition-duration: 0.1s !important;
+					}
+				`;
+				document.head.appendChild(style);
+				
+				// Throttle requestAnimationFrame
+				if (!window.originalRAF) {
+					window.originalRAF = window.requestAnimationFrame;
+					var lastRAFTime = 0;
+					var rafThrottle = 32;
+					window.requestAnimationFrame = function(callback) {
+						var now = Date.now();
+						if (now - lastRAFTime >= rafThrottle) {
+							lastRAFTime = now;
+							return window.originalRAF(callback);
+						} else {
+							return setTimeout(function() {
+								callback(performance.now());
+							}, rafThrottle - (now - lastRAFTime));
+						}
+					};
+				}
+				
+				Game.Notify('Performance Mode', 'Enabled - animations reduced for better performance.', [16, 5], 3);
+			} else {
+				// Disable performance mode
+				window.COOKIE_MODS_PERFORMANCE_MODE = false;
+				// Remove performance styles
+				var styleElement = document.getElementById('performanceModeStyles');
+				if (styleElement) styleElement.remove();
+				
+				// Restore original requestAnimationFrame
+				if (window.originalRAF) {
+					window.requestAnimationFrame = window.originalRAF;
+					window.originalRAF = null;
+				}
+				
+				Game.Notify('Performance Mode', 'Disabled - animations restored.', [16, 5], 3);
+			}
+			Game.toSave=true;
+		}
 		
 		Game.WriteSlider=function(slider,leftText,rightText,startValueFunction,callback)
 		{
@@ -6942,8 +7005,9 @@ Game.Launch=function()
 							Game.WritePrefButton('numbers','numbersButton',loc("Numbers")+ON,loc("Numbers")+OFF)+'<label>('+loc("numbers that pop up when clicking the cookie")+')</label><br>'+
 							Game.WritePrefButton('milk','milkButton',loc("Milk [setting]")+ON,loc("Milk [setting]")+OFF)+(EN?'<label>(only appears with enough achievements)</label>':'')+'<br>'+
 							Game.WritePrefButton('cursors','cursorsButton',loc("Cursors [setting]")+ON,loc("Cursors [setting]")+OFF)+'<label>('+loc("visual display of your cursors")+')</label><br>'+
-							Game.WritePrefButton('modsCookieMonster','modsCookieMonsterButton','Cookie Monster'+ON,'Cookie Monster'+OFF,'Game.ToggleMods();')+'<label>(automation and info mod; page will reload)</label><br>'+
-							Game.WritePrefButton('modsFrozenCookies','modsFrozenCookiesButton','Frozen Cookies'+ON,'Frozen Cookies'+OFF,'Game.ToggleMods();')+'<label>(optimization and utility mod; page will reload)</label><br>'+
+							(Game.prefs.modsCookieMonster ? '<a class="smallFancyButton prefButton option" id="modsCookieMonsterButton" style="opacity:0.5;pointer-events:none;" title="Cookie Monster can only be disabled by reloading the page (F5 or Ctrl+R)">Cookie Monster'+ON+'</a>' : Game.WritePrefButton('modsCookieMonster','modsCookieMonsterButton','Cookie Monster'+ON,'Cookie Monster'+OFF,'Game.ToggleMods();'))+'<label>(automation and info mod; page will reload)</label><br>'+
+							(Game.prefs.modsFrozenCookies ? '<a class="smallFancyButton prefButton option" id="modsFrozenCookiesButton" style="opacity:0.5;pointer-events:none;" title="Frozen Cookies can only be disabled by reloading the page (F5 or Ctrl+R)">Frozen Cookies'+ON+'</a>' : Game.WritePrefButton('modsFrozenCookies','modsFrozenCookiesButton','Frozen Cookies'+ON,'Frozen Cookies'+OFF,'Game.ToggleMods();'))+'<label>(optimization and utility mod; page will reload)</label><br>'+
+							(Game.prefs.modsCookieMonster && Game.prefs.modsFrozenCookies ? Game.WritePrefButton('performanceMode','performanceModeButton','Performance Mode'+ON,'Performance Mode'+OFF,'Game.TogglePerformanceMode();')+'<label>(reduce animations when both mods are active)</label><br>' : '')+
 							Game.WritePrefButton('wobbly','wobblyButton',loc("Wobbly cookie")+ON,loc("Wobbly cookie")+OFF)+(EN?'<label>(your cookie will react when you click it)</label>':'')+'<br>'+
 							Game.WritePrefButton('cookiesound','cookiesoundButton',loc("Alt cookie sound")+ON,loc("Alt cookie sound")+OFF)+(EN?'<label>(how your cookie sounds when you click on it)</label>':'')+'<br>'+
 							Game.WritePrefButton('crates','cratesButton',loc("Icon crates")+ON,loc("Icon crates")+OFF)+'<label>('+loc("display boxes around upgrades and achievements in Stats")+')</label><br>'+

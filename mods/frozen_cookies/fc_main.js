@@ -189,7 +189,19 @@ function setOverrides(gameSaveData) {
         FrozenCookies.loadedData = {};
     }
     loadFCData();
-    FrozenCookies.frequency = 100;
+    // Save preferences to localStorage to ensure they're persisted
+    if (FrozenCookies.savePreferences) {
+        FrozenCookies.savePreferences();
+    }
+    
+    // Performance optimization: reduce frequency when both mods are active
+    if (window.COOKIE_MODS_PERFORMANCE_MODE) {
+        FrozenCookies.frequency = 200; // Double the frequency (slower updates)
+        console.log('[Frozen Cookies] Performance mode detected - reducing update frequency');
+    } else {
+        FrozenCookies.frequency = 100;
+    }
+    
     FrozenCookies.efficiencyWeight = 1.0;
 
     // Becomes 0 almost immediately after user input, so default to 0
@@ -386,6 +398,25 @@ function setOverrides(gameSaveData) {
         }
         return Number(value); // if not overridden by game save or localStorage, defaultVal is returned
     }
+    
+    // Function to save Frozen Cookies preferences to localStorage
+    FrozenCookies.savePreferences = function() {
+        try {
+            // Save all preference values to localStorage
+            for (var prefName in FrozenCookies.preferenceValues) {
+                if (FrozenCookies.preferenceValues.hasOwnProperty(prefName)) {
+                    var value = FrozenCookies[prefName];
+                    if (value !== undefined && value !== null) {
+                        localStorage.setItem(prefName, value.toString());
+                    }
+                }
+            }
+            console.log('[Frozen Cookies] Preferences saved to localStorage');
+        } catch (e) {
+            console.error('[Frozen Cookies] Failed to save preferences to localStorage:', e);
+        }
+    };
+    
     FCStart();
 }
 
@@ -606,6 +637,10 @@ function storeNumberCallback(base, min, max) {
         if (!validateNumber(result, min, max)) result = FrozenCookies[base];
         FrozenCookies[base] = Number(result);
         FCStart();
+        // Save preferences to localStorage
+        if (FrozenCookies.savePreferences) {
+            FrozenCookies.savePreferences();
+        }
     };
 }
 
@@ -730,6 +765,10 @@ function cyclePreference(preferenceName) {
             Game.RefreshStore();
             Game.RebuildUpgrades();
             FCStart();
+            // Save preferences to localStorage
+            if (FrozenCookies.savePreferences) {
+                FrozenCookies.savePreferences();
+            }
         }
     }
 }
@@ -741,6 +780,10 @@ function toggleFrozen(setting) {
         FrozenCookies[setting] = 0;
     }
     FCStart();
+    // Save preferences to localStorage
+    if (FrozenCookies.savePreferences) {
+        FrozenCookies.savePreferences();
+    }
 }
 
 var G = Game.Objects["Farm"].minigame; //Garden
