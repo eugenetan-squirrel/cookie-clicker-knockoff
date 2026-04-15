@@ -379,6 +379,28 @@ function setOverrides(gameSaveData) {
         FrozenCookies.lastHCTime = preferenceParse("lastHCTime", 0);
         FrozenCookies.prevLastHCTime = preferenceParse("prevLastHCTime", 0);
         FrozenCookies.maxHCPercent = preferenceParse("maxHCPercent", 0);
+
+        var firstTimeFC = Object.keys(FrozenCookies.loadedData).length === 0;
+        if (firstTimeFC) {
+            try {
+                firstTimeFC = !Object.keys(FrozenCookies.preferenceValues).some(
+                    function (preference) {
+                        return localStorage.getItem(preference) !== null;
+                    }
+                );
+            } catch (e) {
+                firstTimeFC = true;
+            }
+        }
+
+        if (firstTimeFC) {
+            FrozenCookies.recommendedSettings = 1;
+            logEvent(
+                "recommendedSettings",
+                "First-time Frozen Cookies install detected; applying recommended settings"
+            );
+        }
+
         if (Object.keys(FrozenCookies.loadedData).length > 0) {
             logEvent(
                 "Load",
