@@ -6,7 +6,40 @@
 
 (function() {
     'use strict';
-    
+
+    function getOriginalGameUrl() {
+        var loc = window.location;
+        var host = loc.hostname;
+        if (
+            host === 'translate.google.com' ||
+            host === 'translate.googleusercontent.com' ||
+            host.endsWith('.translate.goog')
+        ) {
+            try {
+                var params = new URLSearchParams(loc.search);
+                if (params.has('u')) {
+                    return params.get('u');
+                }
+            } catch (e) {
+                console.warn('[Mod Loader] Could not parse original URL from translator proxy.', e);
+            }
+        }
+        return null;
+    }
+
+    function resolveModUrl(url) {
+        var originalUrl = getOriginalGameUrl();
+        if (!originalUrl) return url;
+        try {
+            var base = new URL(originalUrl);
+            base.pathname = base.pathname.replace(/[^/]*$/, '');
+            return new URL(url, base).href;
+        } catch (e) {
+            console.warn('[Mod Loader] Could not resolve mod URL from original page URL.', e);
+            return url;
+        }
+    }
+
     function loadAllMods() {
         // Check if Game object exists and is ready
         if (typeof Game === 'undefined' || !Game.LoadMod) {
@@ -19,8 +52,8 @@
         if (Game.prefs && Game.prefs.modsFrozenCookies) {
             try {
                 console.log('[Mod Loader] Loading Frozen Cookies...');
-                // Load from local mods folder
-                Game.LoadMod('mods/frozen_cookies.js');
+                // Load from local mods folder, resolving against the original GitHub Pages URL if translated
+                Game.LoadMod(resolveModUrl('mods/frozen_cookies.js'));
             } catch (e) {
                 console.error('[Mod Loader] Failed to load Frozen Cookies:', e);
             }
@@ -30,7 +63,7 @@
         if (Game.prefs && Game.prefs.modsCookieMonster) {
             try {
                 console.log('[Mod Loader] Loading Cookie Monster from local file...');
-                Game.LoadMod('mods/CookieMonster.js');
+                Game.LoadMod(resolveModUrl('mods/CookieMonster.js'));
             } catch (e) {
                 console.error('[Mod Loader] Failed to load local Cookie Monster:', e);
             }
