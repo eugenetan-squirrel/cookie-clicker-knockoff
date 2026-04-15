@@ -380,24 +380,23 @@ function setOverrides(gameSaveData) {
         FrozenCookies.prevLastHCTime = preferenceParse("prevLastHCTime", 0);
         FrozenCookies.maxHCPercent = preferenceParse("maxHCPercent", 0);
 
-        var firstTimeFC = Object.keys(FrozenCookies.loadedData).length === 0;
-        if (firstTimeFC) {
-            try {
-                firstTimeFC = !Object.keys(FrozenCookies.preferenceValues).some(
-                    function (preference) {
-                        return localStorage.getItem(preference) !== null;
-                    }
-                );
-            } catch (e) {
-                firstTimeFC = true;
-            }
+        var shouldApplyRecommended = Object.keys(FrozenCookies.loadedData).length === 0;
+        if (!shouldApplyRecommended) {
+            // Check if key settings are still at defaults, indicating incomplete setup
+            var keySettings = ['autoClick', 'autoBuy', 'autoGC', 'autoDragon'];
+            shouldApplyRecommended = keySettings.every(function(setting) {
+                return preferenceParse(setting, FrozenCookies.preferenceValues[setting].default) === FrozenCookies.preferenceValues[setting].default;
+            });
         }
-
-        if (firstTimeFC) {
-            FrozenCookies.recommendedSettings = 1;
+        
+        if (shouldApplyRecommended) {
+            // Apply recommended settings for new or incomplete setups
+            recommendedSettingsAction(true);
+            // Update the UI to reflect the new settings
+            if (Game.UpdateMenu) Game.UpdateMenu();
             logEvent(
                 "recommendedSettings",
-                "First-time Frozen Cookies install detected; applying recommended settings"
+                "Applied recommended settings for new setup"
             );
         }
 
@@ -938,8 +937,8 @@ function buyOtherUpgrades() {
     });
 }
 
-function recommendedSettingsAction() {
-    if (FrozenCookies.recommendedSettings == 1) {
+function recommendedSettingsAction(firstTimeSetup = false) {
+    if (FrozenCookies.recommendedSettings == 1 || firstTimeSetup) {
         // clicking options
         FrozenCookies.autoClick = 1;
         FrozenCookies.cookieClickSpeed = 250;
@@ -1028,11 +1027,13 @@ function recommendedSettingsAction() {
         FrozenCookies.trackStats = 0;
         logEvent(
             "recommendedSettings",
-            "Set all options to recommended values"
+            firstTimeSetup ? "Applied recommended settings for first-time setup" : "Set all options to recommended values"
         );
-        FrozenCookies.recommendedSettings = 0;
-        Game.toSave = true;
-        Game.toReload = true;
+        if (!firstTimeSetup) {
+            FrozenCookies.recommendedSettings = 0;
+            Game.toSave = true;
+            Game.toReload = true;
+        }
     }
 }
 
